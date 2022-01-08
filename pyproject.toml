@@ -1,3 +1,20 @@
+[tool.black]
+line-length = 79
+target-version = ['py37']
+exclude = '''
+(
+  /(
+      __pycache__
+    | \.vscode
+    | build
+    | contrib
+    | dist
+    | doc
+    | \.?venv3?
+  )/
+)
+'''
+
 [tool.poetry]
 name = "coshed-flask"
 version = "0.15.0"

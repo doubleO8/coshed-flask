@@ -117,7 +117,9 @@ def wolfication(flask_app_instance, **kwargs):
             maxBytes=kwargs.get("maxBytes", ROTATING_LOG_MAX_BYTES),
             backupCount=kwargs.get("backupCount", ROTATING_LOG_BACKUP_COUNT),
         )
-        rotating_app_log(flask_app_instance, kwargs.get("app_name"), **log_kwargs)
+        rotating_app_log(
+            flask_app_instance, kwargs.get("app_name"), **log_kwargs
+        )
 
     return flask_app_instance
 
@@ -125,7 +127,8 @@ def wolfication(flask_app_instance, **kwargs):
 def request_wants_mimetype(mtb, other="text/html"):
     best = request.accept_mimetypes.best_match([mtb, other])
     return (
-        best == mtb and request.accept_mimetypes[best] > request.accept_mimetypes[other]
+        best == mtb
+        and request.accept_mimetypes[best] > request.accept_mimetypes[other]
     )
 
 
@@ -155,6 +158,8 @@ def generate_expires_header(expires=False):
         now = datetime.datetime.now()
         expires_time = now + datetime.timedelta(seconds=expires)
         headers["Cache-Control"] = "public"
-        headers["Expires"] = format_date_time(time.mktime(expires_time.timetuple()))
+        headers["Expires"] = format_date_time(
+            time.mktime(expires_time.timetuple())
+        )
 
     return headers

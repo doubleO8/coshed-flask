@@ -66,7 +66,9 @@ class AppResponse(dict):
                 whitelist_key = None
                 (i_url, i_label) = data
 
-            if whitelist_key and whitelist_key not in self.get("whitelist", []):
+            if whitelist_key and whitelist_key not in self.get(
+                "whitelist", []
+            ):
                 continue
             yield i_url, i_label
 
@@ -130,4 +132,6 @@ class AppResponse(dict):
             headers["Content-Type"] = "text/plain"
             status_code = 500
 
-        return flask.Response(status=status_code, headers=headers, response=body)
+        return flask.Response(
+            status=status_code, headers=headers, response=body
+        )
