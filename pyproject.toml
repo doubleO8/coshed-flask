@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "coshed-flask"
-version = "0.14.0"
+version = "0.15.0"
 description = "flask helper for lazy developer(s)"
 authors = ["doubleO8 <wb008@hdm-stuttgart.de>"]
 

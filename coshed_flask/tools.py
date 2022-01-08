@@ -5,7 +5,11 @@ import tempfile
 import uuid
 import logging
 from logging.handlers import RotatingFileHandler
+import datetime
+import time
+from wsgiref.handlers import format_date_time
 
+from flask import request
 from flask_cors import CORS
 from flask_compress import Compress
 import six
@@ -20,6 +24,21 @@ formatter = logging.Formatter(
     "(#%(lineno)04d): %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
+
+WANT_DEV = ("i-like-my-sugar-with", "coffee-and-cream")
+
+
+def drop_dev(want_dev=None):
+    if want_dev is None:
+        want_dev = WANT_DEV
+
+    try:
+        (arg_name, expectation) = want_dev
+        return not request.args.get(arg_name) == expectation
+    except Exception:
+        pass
+
+    return True
 
 
 def rotating_app_log(flask_app_instance, app_name=None, **kwargs):
@@ -101,3 +120,41 @@ def wolfication(flask_app_instance, **kwargs):
         rotating_app_log(flask_app_instance, kwargs.get("app_name"), **log_kwargs)
 
     return flask_app_instance
+
+
+def request_wants_mimetype(mtb, other="text/html"):
+    best = request.accept_mimetypes.best_match([mtb, other])
+    return (
+        best == mtb and request.accept_mimetypes[best] > request.accept_mimetypes[other]
+    )
+
+
+def request_wants_json():
+    return request_wants_mimetype("application/json")
+
+
+def generate_expires_header(expires=False):
+    """
+    Generate HTTP expiration header.
+
+    Args:
+        expires: expiration in seconds or False for *imediately / no caching*
+
+    Returns:
+        dict: key/value pairs defining HTTP expiration information
+    """
+    headers = {}
+
+    if expires is False:
+        headers["Cache-Control"] = (
+            "no-store, no-cache, must-revalidate, "
+            "post-check=0, pre-check=0, max-age=0"
+        )
+        headers["Expires"] = "-1"
+    else:
+        now = datetime.datetime.now()
+        expires_time = now + datetime.timedelta(seconds=expires)
+        headers["Cache-Control"] = "public"
+        headers["Expires"] = format_date_time(time.mktime(expires_time.timetuple()))
+
+    return headers
