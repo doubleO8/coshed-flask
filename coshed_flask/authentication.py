@@ -58,6 +58,17 @@ def hash_tuple(username, password, method=None):
 
     Returns:
         tuple: user identifier and password hash
+
+    >>> user = "test 123"
+    >>> password = "$wordfishöäü"
+    >>> k, v = hash_tuple(user, password)
+    >>> os.environ[k] = v
+    >>> check_password_hash_env(user, password)
+    True
+    >>> check_password_hash_env(user, "wrong")
+    False
+    >>> check_password_hash_env("no-user", "wrong")
+    False
     """
     if method is None:
         method = "pbkdf2:sha256:100000"
@@ -66,3 +77,10 @@ def hash_tuple(username, password, method=None):
     user_id = username_identifier(username)
 
     return (user_id, password_hash)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    (FAILED, SUCCEEDED) = doctest.testmod()
+    print("[doctest] SUCCEEDED/FAILED: {:d}/{:d}".format(SUCCEEDED, FAILED))
